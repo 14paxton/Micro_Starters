@@ -1,3 +1,6 @@
+import PipInstall.PackageName.*
+import PipInstall.resolvePackages
+import PipInstall.wheelOsStandard
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import io.micronaut.gradle.docker.NativeImageDockerfile
 import org.graalvm.buildtools.gradle.dsl.NativeImageOptions
@@ -5,6 +8,7 @@ import org.graalvm.buildtools.gradle.dsl.NativeImageOptions
 // *************************************************************************************************************************************
 // Version Variables *******************************************************************************************************************
 
+val graalPythonVersion: String by project
 val graalVersion: String by project
 val port: String by project
 val jvmVersion: String by project
@@ -29,7 +33,6 @@ group = groupName
 version = "0.1"
 
 repositories {
-  gradlePluginPortal()
   mavenLocal()
   mavenCentral()
 }
@@ -48,10 +51,42 @@ java {
 }
 
 
+// *************************************************************************************************************************************
+// PYTHON LIBRARIES Import *************************************************************************************************************
+
+val localPackageInstallPathList: Set<String> = resolvePackages(rootDir,
+                                                               listOf(PADDLEPADDLE, PADDLEOCR, SCIPY, PANDAS, SCIKIT_LEARN, SHAPELY, TIKTOKEN))
+val packagesForPipToPull: Set<String> = setOf("numpy>=1.26.4",
+                                              "python-dotenv>=1.1.1",
+                                              "tqdm>=4.67.1",
+                                              "PyYAML>=6.0.2",
+                                              "pydantic>=2.11.7",
+                                              "pillow>=11.3.0")
+
+graalPy {
+
+  // resourceDirectory.set("GRAALPY-VFS/com/skeleton")
+  // resourceDirectory.set("org.graalvm.python.vfs")
+
+  packages.set(buildSet {
+    add("--prefer-binary")
+    add(wheelOsStandard)
+    addAll(packagesForPipToPull)
+    addAll(localPackageInstallPathList)
+  })
+}
+
+// END PYTHON LIBRARIES Import *********************************************************************************************************
+// *************************************************************************************************************************************
+
 
 dependencies {
   compileOnly("io.micronaut:micronaut-http-client")
 
+  implementation("org.graalvm.polyglot:polyglot:$graalPythonVersion")
+  implementation("org.graalvm.polyglot:python:$graalPythonVersion")
+
+  implementation("io.micronaut.views:micronaut-views-thymeleaf")
   implementation("io.micronaut:micronaut-http-server-netty")
   implementation("io.micronaut.graal-languages:micronaut-graalpy")
   implementation("io.micronaut.serde:micronaut-serde-jackson")
@@ -143,6 +178,43 @@ tasks.withType<Jar> {
 tasks.withType<ShadowJar> {
   isZip64 = true
 }
+
+
+//*************************************************************************************************************************
+// Python Resources For Local .VENV **************************************************************************************
+
+
+val cleanVenv by tasks.registering(Delete::class) {
+  delete(layout.projectDirectory.dir(".venv"))
+
+  doLast {
+    println("deleted .venv directory")
+  }
+}
+
+tasks.register<Copy>("copyVenvResources") {
+  group = "python"
+  description = "Cleans then copies GraalPy venv resources to .venv"
+  dependsOn("graalPyResources", cleanVenv)
+
+  from(layout.buildDirectory.dir("generated/graalpy/resources/org.graalvm.python.vfs/venv")) {
+    include("**/*")
+  }
+  into(layout.projectDirectory.dir(".venv"))
+
+  doLast {
+    println("Copied GraalPy venv resources to .venv directory")
+  }
+}
+
+
+tasks.named("graalPyResources") {
+  finalizedBy("copyVenvResources")
+}
+
+
+// END Python Resources For Local .VENV ***********************************************************************************************
+// *************************************************************************************************************************************
 
 
 // *************************************************************************************************************************************
