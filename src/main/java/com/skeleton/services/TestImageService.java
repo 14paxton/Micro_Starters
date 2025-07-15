@@ -4,14 +4,15 @@ import com.skeleton.modules.TestImageModule;
 import jakarta.inject.Singleton;
 
 @Singleton
-public class TestImageService implements TestImageModule {
+public class TestImageService {
 
-  public void createTestImage() {
-    create_test_image();
+  private final TestImageModule testImageModule;
+
+  public TestImageService(TestImageModule testImageModule) {
+    this.testImageModule = testImageModule;
   }
 
-  @Override
-  public void create_test_image() {
-    // Implementation will be provided by GraalPy
+  public void createTestImage(String output_path) {
+    testImageModule.create_test_image(output_path);
   }
 }
