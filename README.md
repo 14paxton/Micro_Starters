@@ -1,11 +1,13 @@
-# POC_GraalPyMicroservice
-
-> proof of concept adding python to microservice
-
 # GraalPy
 
 - > Using Micronaut with java and Gradle with Kotlin created an application that can handle http calls and
   > run Python libraries and code
+
+# Application Endpoints
+
+- [localhost:8181/pygal](http://localhost:8181/pygal ) : PygalController imported python library, uses @GraalPyModule annotation, creates charts
+- [localhost:8181/hello](http://localhost:8181/hello ) : HelloController local python script in resource folder
+- [localhost:8181/sentiment](http://localhost:8181/sentiment) : SentimentAnalysisController manually creating Python context and getting a library
 
 # Install
 
@@ -91,7 +93,8 @@ brew install pkg-config;
 ## Run Native Image
 
   ```shell
-    ./build/native/nativeCompile/nativeNameplateDataLogger
+    ./build/native/nativeCompile/nativeChangeMe
+    
   ```
 
 ## Optimized Native Compile
@@ -107,7 +110,8 @@ brew install pkg-config;
 ### Run
 
    ```shell
-        ./build/native/nativeOptimizedCompile/optimizedNativeNameplateDataLogger
+        ./build/native/nativeOptimizedCompile/optimizedNativeChangeMe
+        
    ```
 
 - view at [http://localhost:8181/ ](http://localhost:8181/ )
@@ -121,12 +125,12 @@ brew install pkg-config;
    ```
 
 - Dockerfile for build will be `build/docker/native-optimized/DockerfileNative`
-- Created image should be `nameplate-data-logger:latest`
+- Created image should be `changeMe:latest`
 
 #### Run Image
 
    ```shell
-        docker run  --name nameplatedatalogger --rm -p 8181:8181 nameplate-data-logger:latest
+        docker run  --name changeMe --rm -p 8181:8181 changeMe:latest
    ```
 
 # Resources

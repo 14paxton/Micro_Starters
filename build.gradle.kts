@@ -5,9 +5,11 @@ import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import io.micronaut.gradle.docker.NativeImageDockerfile
 import org.graalvm.buildtools.gradle.dsl.NativeImageOptions
 
+
 // *************************************************************************************************************************************
 // Version Variables *******************************************************************************************************************
 
+val micronautVersion: String by project
 val graalPythonVersion: String by project
 val graalVersion: String by project
 val port: String by project
@@ -39,6 +41,10 @@ repositories {
 
 application {
   mainClass.set(mainClassName)
+  applicationDefaultJvmArgs = listOf("-Dpolyglot.engine.WarnInterpreterOnly=false",
+                                     "-Dpolyglot.log.file=Log/truffle.log",
+                                     "--enable-native-access=org.graalvm.truffle",
+                                     "-Dpolyglot.engine.WarnVirtualThreadSupport=false")
 }
 
 java {
@@ -56,12 +62,17 @@ java {
 
 val localPackageInstallPathList: Set<String> = resolvePackages(rootDir,
                                                                listOf(PADDLEPADDLE, PADDLEOCR, SCIPY, PANDAS, SCIKIT_LEARN, SHAPELY, TIKTOKEN))
-val packagesForPipToPull: Set<String> = setOf("numpy>=1.26.4",
-                                              "python-dotenv>=1.1.1",
-                                              "tqdm>=4.67.1",
-                                              "PyYAML>=6.0.2",
-                                              "pydantic>=2.11.7",
-                                              "pillow>=11.3.0")
+val packagesForPipToPull: Set<String> = setOf(
+        "numpy>=1.26.4",
+        // "python-dotenv>=1.1.1",
+        // "tqdm>=4.67.1",
+        // "PyYAML>=6.0.2",
+        // "pydantic>=2.11.7",
+        "pillow>=11.3.0",
+        "pygal",
+        "vader-sentiment==3.2.1.1",
+        "requests"
+                                             )
 
 graalPy {
 
@@ -72,7 +83,7 @@ graalPy {
     add("--prefer-binary")
     add(wheelOsStandard)
     addAll(packagesForPipToPull)
-    addAll(localPackageInstallPathList)
+    // addAll(localPackageInstallPathList)
   })
 }
 
@@ -81,27 +92,29 @@ graalPy {
 
 
 dependencies {
+  // Micronaut implementation
+  implementation("io.micronaut:micronaut-http-server-netty")
+  implementation("io.micronaut.graal-languages:micronaut-graalpy")
+  implementation("io.micronaut.serde:micronaut-serde-jackson")
+  implementation("io.micronaut.views:micronaut-views-thymeleaf")
+
+  // Runtime dependencies
+  runtimeOnly("org.yaml:snakeyaml")
+  runtimeOnly("ch.qos.logback:logback-classic")
+
+  // Test dependencies
+  testImplementation("io.micronaut:micronaut-http-client")
+  testImplementation("io.micronaut.test:micronaut-test-junit5")
+  testImplementation("org.junit.jupiter:junit-jupiter-api")
+  testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
+
+  // Annotation processors
+  annotationProcessor("io.micronaut:micronaut-http-validation")
+  annotationProcessor("io.micronaut.serde:micronaut-serde-processor")
   compileOnly("io.micronaut:micronaut-http-client")
 
   implementation("org.graalvm.polyglot:polyglot:$graalPythonVersion")
   implementation("org.graalvm.polyglot:python:$graalPythonVersion")
-
-  implementation("io.micronaut.views:micronaut-views-thymeleaf")
-  implementation("io.micronaut:micronaut-http-server-netty")
-  implementation("io.micronaut.graal-languages:micronaut-graalpy")
-  implementation("io.micronaut.serde:micronaut-serde-jackson")
-
-  runtimeOnly("org.yaml:snakeyaml")
-  runtimeOnly("ch.qos.logback:logback-classic")
-
-  testImplementation("io.micronaut:micronaut-http-client")
-  testImplementation("io.micronaut.test:micronaut-test-junit5")
-  testImplementation("org.junit.jupiter:junit-jupiter-api")
-
-  testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
-
-  annotationProcessor("io.micronaut:micronaut-http-validation")
-  annotationProcessor("io.micronaut.serde:micronaut-serde-processor")
 }
 
 
@@ -145,7 +158,7 @@ fun NativeImageOptions.configureNativeBinary(imageName: String, fallbackEnabled:
   richOutput.set(true)
   verbose.set(true)
   fallback.set(fallbackEnabled)
-  mainClass.set(mainClass)
+  mainClass.set(mainClassName)
   resources.autodetect()
   javaLauncher.set(javaToolchains.launcherFor {
     languageVersion.set(JavaLanguageVersion.of(jvmVersion))
@@ -183,7 +196,6 @@ tasks.withType<ShadowJar> {
 //*************************************************************************************************************************
 // Python Resources For Local .VENV **************************************************************************************
 
-
 val cleanVenv by tasks.registering(Delete::class) {
   delete(layout.projectDirectory.dir(".venv"))
 
@@ -212,30 +224,36 @@ tasks.named("graalPyResources") {
   finalizedBy("copyVenvResources")
 }
 
-
 // END Python Resources For Local .VENV ***********************************************************************************************
-// *************************************************************************************************************************************
 
 
-// *************************************************************************************************************************************
-// Build Performance Optimizations *****************************************************************************************************
+// This explicitly tells Gradle that processResources and processTestResources tasks depend on the graalPyResources task, ensuring proper task
+// ordering.
+tasks.named("processResources") {
+  dependsOn("graalPyResources")
+}
+tasks.named("processTestResources") {
+  dependsOn("graalPyResources")
+}
 
-// Enable build caching and parallel execution
-gradle.startParameter.isBuildCacheEnabled = true
+tasks.named("test") {
+  dependsOn("graalPyResources")
+}
 
-// Configure test tasks for better performance
-tasks.withType<Test>()
-        .configureEach {
-          useJUnitPlatform()
+// This tells Gradle to include duplicate resources rather than failing the build when it encounters them.
+tasks.withType<ProcessResources> {
+  duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
 
-          maxParallelForks = (Runtime.getRuntime()
-                                      .availableProcessors() / 2).coerceAtLeast(1)
-
-          testLogging {
-            events("passed", "skipped", "failed")
-            showStandardStreams = false
-          }
-
-          // Optional: enable caching unless explicitly disabled
-          outputs.cacheIf { true }
-        }
+sourceSets {
+  main {
+    resources {
+      srcDir("build/generated/graalpy/resources")
+    }
+  }
+  test {
+    resources {
+      srcDir("build/generated/graalpy/resources")
+    }
+  }
+}
