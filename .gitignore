@@ -16,3 +16,4 @@ out/
 .venv
 /.profileconfig.json
 testOutput
+buildSrc/build/
