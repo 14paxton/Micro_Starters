@@ -63,11 +63,11 @@ java {
 val localPackageInstallPathList: Set<String> = resolvePackages(rootDir,
                                                                listOf(PADDLEPADDLE, PADDLEOCR, SCIPY, PANDAS, SCIKIT_LEARN, SHAPELY, TIKTOKEN))
 val packagesForPipToPull: Set<String> = setOf(
-        "numpy>=1.26.4",
         // "python-dotenv>=1.1.1",
         // "tqdm>=4.67.1",
         // "PyYAML>=6.0.2",
         // "pydantic>=2.11.7",
+        "numpy>=1.26.4",
         "pillow>=11.3.0",
         "pygal",
         "vader-sentiment==3.2.1.1",
@@ -225,35 +225,3 @@ tasks.named("graalPyResources") {
 }
 
 // END Python Resources For Local .VENV ***********************************************************************************************
-
-
-// This explicitly tells Gradle that processResources and processTestResources tasks depend on the graalPyResources task, ensuring proper task
-// ordering.
-tasks.named("processResources") {
-  dependsOn("graalPyResources")
-}
-tasks.named("processTestResources") {
-  dependsOn("graalPyResources")
-}
-
-tasks.named("test") {
-  dependsOn("graalPyResources")
-}
-
-// This tells Gradle to include duplicate resources rather than failing the build when it encounters them.
-tasks.withType<ProcessResources> {
-  duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-}
-
-sourceSets {
-  main {
-    resources {
-      srcDir("build/generated/graalpy/resources")
-    }
-  }
-  test {
-    resources {
-      srcDir("build/generated/graalpy/resources")
-    }
-  }
-}
