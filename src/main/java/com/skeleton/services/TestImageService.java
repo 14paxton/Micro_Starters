@@ -5,7 +5,7 @@ import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 
 @Singleton
-class TestImageService {
+public class TestImageService {
 
   @Inject
   TestImageModule testImageModule;
