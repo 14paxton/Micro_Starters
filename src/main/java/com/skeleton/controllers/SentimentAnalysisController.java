@@ -1,5 +1,6 @@
-package com.skeleton;
+package com.skeleton.controllers;
 
+import com.skeleton.services.SentimentAnalysisService;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Get;
 import io.micronaut.http.annotation.QueryValue;
@@ -12,9 +13,12 @@ import java.util.Map;
 
 @Controller("/sentiment")
 public class SentimentAnalysisController {
+  SentimentAnalysisService sentimentAnalysisService;
 
   @Inject
-  VaderSentimentModule vaderSentiment;
+  public SentimentAnalysisController(SentimentAnalysisService sentimentAnalysisService) {
+    this.sentimentAnalysisService = sentimentAnalysisService;
+  }
 
   @Get
   @View("sentiment")
@@ -25,17 +29,6 @@ public class SentimentAnalysisController {
   @Get(value = "/analyze")
   @ExecuteOn(TaskExecutors.BLOCKING)
   public Map<String, Double> analyze(@QueryValue String text) {
-    if (text == null || text.trim()
-                            .isEmpty()) {
-      throw new IllegalArgumentException("Text parameter is required");
-    }
-
-    try {
-      VaderSentimentModule.SentimentIntensityAnalyzer sentimentAnalysis = vaderSentiment.SentimentIntensityAnalyzer();
-      return sentimentAnalysis.polarity_scores(text);
-    }
-    catch (Exception e) {
-      throw new RuntimeException("Error analyzing sentiment: " + e.getMessage(), e);
-    }
+    return sentimentAnalysisService.polarityScores(text);
   }
 }

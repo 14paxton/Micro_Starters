@@ -1,5 +1,6 @@
-package com.skeleton;
+package com.skeleton.controllers;
 
+import com.skeleton.services.DataAnalysisService;
 import io.micronaut.http.HttpStatus;
 import io.micronaut.http.MediaType;
 import io.micronaut.http.annotation.Controller;
@@ -10,15 +11,14 @@ import io.micronaut.http.multipart.StreamingFileUpload;
 import io.micronaut.scheduling.TaskExecutors;
 import io.micronaut.scheduling.annotation.ExecuteOn;
 import io.micronaut.views.View;
-import jakarta.inject.Inject;
-
-import java.nio.charset.StandardCharsets;
 
 @Controller
 public class DataAnalysisController {
+  private final DataAnalysisService dataAnalysisService;
 
-  @Inject
-  DataAnalysisModule dataAnalysisModule;
+  public DataAnalysisController(DataAnalysisService dataAnalysisService) {
+    this.dataAnalysisService = dataAnalysisService;
+  }
 
   @Get
   @View("index")
@@ -29,11 +29,7 @@ public class DataAnalysisController {
   @ExecuteOn(TaskExecutors.IO)
   String analyzeCsvMulti(StreamingFileUpload file) {
     try {
-      String csv = new String(file.asInputStream()
-                                  .readAllBytes(), StandardCharsets.UTF_8);
-
-      return dataAnalysisModule.mean(csv)
-                               .toString();
+      return dataAnalysisService.mean(file);
     }
     catch (Exception e) {
       throw new HttpStatusException(HttpStatus.BAD_REQUEST, e.getMessage());

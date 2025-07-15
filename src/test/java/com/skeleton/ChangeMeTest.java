@@ -2,19 +2,22 @@ package com.skeleton;
 
 import io.micronaut.runtime.EmbeddedApplication;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
-import jakarta.inject.Inject;
-import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 @MicronautTest
+@Tag("smoke")
 class ChangeMeTest {
+  private final EmbeddedApplication<?> application;
 
-  @Inject
-  EmbeddedApplication<?> application;
-
-  @Test
-  void testItWorks() {
-    Assertions.assertTrue(application.isRunning());
+  ChangeMeTest(EmbeddedApplication<?> application) {
+    this.application = application;
   }
 
+  @Test
+  void applicationStarts() {
+    assertTrue(application.isRunning(), "Application should be running");
+  }
 }

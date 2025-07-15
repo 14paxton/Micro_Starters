@@ -1,4 +1,4 @@
-package com.skeleton;
+package com.skeleton.controllers;
 
 import io.micronaut.core.type.Argument;
 import io.micronaut.http.HttpRequest;
