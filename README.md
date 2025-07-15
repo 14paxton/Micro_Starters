@@ -8,15 +8,6 @@
    ```shell
     sdk env
    ```
-3) with Gradle wrapper, no need to install anything else, wouldn't necessarily need python installed either
-
-## MacOs
-
-```shell
-brew install jpeg;
-brew install libtiff libjpeg libpng freetype;
-brew install pkg-config;
-```
 
 # Build
 
