@@ -1,4 +1,3 @@
-import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import io.micronaut.gradle.docker.NativeImageDockerfile
 import org.graalvm.buildtools.gradle.dsl.NativeImageOptions
 
@@ -19,7 +18,6 @@ val mainClassName = "$groupName.Application"
 
 plugins {
   id("io.micronaut.application") version "4.5.4"
-  id("org.graalvm.python") version "24.2.1"
   id("com.gradleup.shadow") version "8.3.8"
   id("io.micronaut.aot") version "4.5.3"
   kotlin("jvm") version "2.2.0"
@@ -29,7 +27,6 @@ group = groupName
 version = "0.1"
 
 repositories {
-  gradlePluginPortal()
   mavenLocal()
   mavenCentral()
 }
@@ -47,26 +44,64 @@ java {
   }
 }
 
+//** building on mac ** //
+// buildscript {
+//    dependencies {
+//        classpath("com.github.docker-java:docker-java-transport-httpclient5:3.4.0") {
+//            because("M1 macs need a later version of JNA")
+//        }
+//    }
+//}
 
+// shadowJar {
+//    archiveBaseName.set('shadow') // Set the base name of the jar
+//    archiveClassifier.set('')
+//    archiveVersion.set('')
+//}
 
 dependencies {
+  // Core implementation dependencies
+  implementation("io.micronaut:micronaut-http-client-jdk")
+  implementation("io.micronaut:micronaut-http-server-netty")
+  implementation("io.micronaut.serde:micronaut-serde-jackson")
+  /** From GraalVM Guide **/
+  implementation("jakarta.validation:jakarta.validation-api")
+
+  // Compile-only dependencies
   compileOnly("io.micronaut:micronaut-http-client")
 
-  implementation("io.micronaut:micronaut-http-server-netty")
-  implementation("io.micronaut.graal-languages:micronaut-graalpy")
-  implementation("io.micronaut.serde:micronaut-serde-jackson")
-
+  // Runtime dependencies
   runtimeOnly("org.yaml:snakeyaml")
   runtimeOnly("ch.qos.logback:logback-classic")
 
+  // Annotation processors
+  annotationProcessor("io.micronaut:micronaut-http-validation")
+  annotationProcessor("io.micronaut.validation:micronaut-validation-processor")
+  annotationProcessor("io.micronaut.serde:micronaut-serde-processor")
+
+  // Test dependencies
   testImplementation("io.micronaut:micronaut-http-client")
   testImplementation("io.micronaut.test:micronaut-test-junit5")
   testImplementation("org.junit.jupiter:junit-jupiter-api")
-
   testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
 
-  annotationProcessor("io.micronaut:micronaut-http-validation")
-  annotationProcessor("io.micronaut.serde:micronaut-serde-processor")
+  /*** Not With Controller ***/
+  //    implementation("com.amazonaws:aws-lambda-java-events")
+  //    implementation("io.micronaut.aws:micronaut-function-aws")
+  //    implementation("io.micronaut.aws:micronaut-function-aws-custom-runtime")
+
+  /*** email ***/
+  // implementation("io.micronaut.email:micronaut-email-sendgrid")
+
+  /*** reactive streams ***/
+  // implementation("io.micronaut.reactor:micronaut-reactor")
+
+  /*** from aws micronaut docs ***/
+  //    implementation("io.micronaut:micronaut-http-client")
+
+  /*** remove dependency for macos ***/
+  //    runtimeOnly("io.netty:netty-resolver-dns-native-macos:4.2.0.Alpha4")
+  //    implementation("com.github.docker-java:docker-java-transport-httpclient5:3.3.1")
 }
 
 
@@ -103,6 +138,9 @@ graalvmNative {
       configureNativeBinary("optimizedNativeChangeMe", fallbackEnabled = true)
     }
   }
+  metadataRepository {
+    enabled.set(true)
+  }
 }
 
 fun NativeImageOptions.configureNativeBinary(imageName: String, fallbackEnabled: Boolean) {
@@ -110,8 +148,9 @@ fun NativeImageOptions.configureNativeBinary(imageName: String, fallbackEnabled:
   richOutput.set(true)
   verbose.set(true)
   fallback.set(fallbackEnabled)
-  mainClass.set(mainClass)
+  mainClass.set(mainClassName)
   resources.autodetect()
+  buildArgs.add("--verbose")
   javaLauncher.set(javaToolchains.launcherFor {
     languageVersion.set(JavaLanguageVersion.of(jvmVersion))
     vendor.set(graalJvmVendor)
@@ -123,7 +162,25 @@ fun NativeImageOptions.configureNativeBinary(imageName: String, fallbackEnabled:
 
 
 // *************************************************************************************************************************************
-// Dockerfile.graalpy-vfs instructions *************************************************************************************************
+// Dockerfile *************************************************************************************************
+
+// dockerfileNative {
+//    jdkVersion = '21'
+//    graalArch.set(org.apache.tools.ant.taskdefs.condition.Os.isArch("aarch64") ? "aarch64" : "amd64")
+//    graalImage.set('ghcr.io/graalvm/graalvm-ce:ol8-java17-22.3.3')
+//}
+
+// tasks.named("nativeCompile") {
+//    classpathJar = layout.projectDirectory.file("build/libs/shadow.jar")
+//}
+
+// tasks.named("dockerfileNative") {
+//   baseImage = "amazonlinux:2023"
+//   jdkVersion = "21"
+//   args("-XX:MaximumHeapSizePercent=80",
+//        "-Dio.netty.allocator.numDirectArenas=0",
+//        "-Dio.netty.noPreferDirect=true")
+// }
 
 tasks.named<NativeImageDockerfile>("optimizedDockerfileNative") {
   jdkVersion.set(jvmVersion)
@@ -132,17 +189,8 @@ tasks.named<NativeImageDockerfile>("optimizedDockerfileNative") {
   exposedPorts.set(setOf(port.toInt()))
 }
 
-// END Dockerfile.graalpy-vfs **********************************************************************************************************
+// END Dockerfile **********************************************************************************************************
 // *************************************************************************************************************************************
-
-
-tasks.withType<Jar> {
-  isZip64 = true
-}
-
-tasks.withType<ShadowJar> {
-  isZip64 = true
-}
 
 
 // *************************************************************************************************************************************
