@@ -1,4 +1,4 @@
-package com.skeleton;
+package com.skeleton.modules;
 
 import io.micronaut.graal.graalpy.annotations.GraalPyModule;
 

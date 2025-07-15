@@ -1,5 +1,6 @@
-package com.skeleton;
+package com.skeleton.controllers;
 
+import com.skeleton.services.PygalService;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Get;
 import io.micronaut.http.annotation.Produces;
@@ -9,17 +10,15 @@ import jakarta.inject.Inject;
 
 @Controller("/pygal")
 class PygalController {
+
   @Inject
-  PygalModule pygal;
+  PygalService pygalService;
 
   @ExecuteOn(TaskExecutors.BLOCKING)
   @Get
   @Produces("image/svg+xml")
   public String index() {
-    PygalModule.StackedBar stackedBar = pygal.StackedBar();
-    stackedBar.add("Fibonacci", new int[]{0, 1, 1, 2, 3, 5, 8});
-    PygalModule.Svg svg = stackedBar.render();
-    return svg.decode();
+    return pygalService.createSVG();
   }
 
 }
