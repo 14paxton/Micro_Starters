@@ -1,16 +1,14 @@
-import PipInstall.PackageName.*
-import PipInstall.resolvePackages
-import PipInstall.wheelOsStandard
-import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
-import io.micronaut.gradle.docker.NativeImageDockerfile
-import org.graalvm.buildtools.gradle.dsl.NativeImageOptions
-
+plugins {
+  id("io.micronaut.application") version "4.5.4"
+  id("com.gradleup.shadow") version "8.3.8"
+  id("io.micronaut.aot") version "4.5.3"
+  kotlin("jvm") version "2.2.0"
+  id("org.graalvm.python") version "24.2.1"
+}
 
 // *************************************************************************************************************************************
 // Version Variables *******************************************************************************************************************
 
-val micronautVersion: String by project
-val graalPythonVersion: String by project
 val graalVersion: String by project
 val port: String by project
 val jvmVersion: String by project
@@ -18,18 +16,10 @@ val javaVersion = JavaVersion.toVersion(jvmVersion)
 val graalJvmVendor = JvmVendorSpec.ORACLE
 val groupName = "com.skeleton"
 val mainClassName = "$groupName.Application"
+val graalPythonVersion: String by project
 
 // END Version Variables ***************************************************************************************************************
 // *************************************************************************************************************************************
-
-
-plugins {
-  id("io.micronaut.application") version "4.5.4"
-  id("org.graalvm.python") version "24.2.1"
-  id("com.gradleup.shadow") version "8.3.8"
-  id("io.micronaut.aot") version "4.5.3"
-  kotlin("jvm") version "2.2.0"
-}
 
 group = groupName
 version = "0.1"
@@ -41,10 +31,6 @@ repositories {
 
 application {
   mainClass.set(mainClassName)
-  applicationDefaultJvmArgs = listOf("-Dpolyglot.engine.WarnInterpreterOnly=false",
-                                     "-Dpolyglot.log.file=Log/truffle.log",
-                                     "--enable-native-access=org.graalvm.truffle",
-                                     "-Dpolyglot.engine.WarnVirtualThreadSupport=false")
 }
 
 java {
@@ -60,14 +46,14 @@ java {
 // *************************************************************************************************************************************
 // PYTHON LIBRARIES Import *************************************************************************************************************
 
-val localPackageInstallPathList: Set<String> = resolvePackages(rootDir,
-                                                               listOf(PipInstall.PackageName.PADDLEPADDLE,
-                                                                      PipInstall.PackageName.PADDLEOCR,
-                                                                      PipInstall.PackageName.SCIPY,
-                                                                      PipInstall.PackageName.PANDAS,
-                                                                      PipInstall.PackageName.SCIKIT_LEARN,
-                                                                      PipInstall.PackageName.SHAPELY,
-                                                                      PipInstall.PackageName.TIKTOKEN))
+val localPackageInstallPathList: Set<String> = PipInstall.resolvePackages(rootDir,
+                                                                          listOf(PipInstall.PackageName.PADDLEPADDLE,
+                                                                                 PipInstall.PackageName.PADDLEOCR,
+                                                                                 PipInstall.PackageName.SCIPY,
+                                                                                 PipInstall.PackageName.PANDAS,
+                                                                                 PipInstall.PackageName.SCIKIT_LEARN,
+                                                                                 PipInstall.PackageName.SHAPELY,
+                                                                                 PipInstall.PackageName.TIKTOKEN))
 val packagesForPipToPull: Set<String> = setOf(
         // "python-dotenv>=1.1.1",
         // "tqdm>=4.67.1",
@@ -87,7 +73,7 @@ graalPy {
 
   packages.set(buildSet {
     add("--prefer-binary")
-    add(wheelOsStandard)
+    add(PipInstall.wheelOsStandard)
     addAll(packagesForPipToPull)
     // addAll(localPackageInstallPathList)
   })
@@ -159,7 +145,7 @@ graalvmNative {
   }
 }
 
-fun NativeImageOptions.configureNativeBinary(imageName: String, fallbackEnabled: Boolean) {
+fun org.graalvm.buildtools.gradle.dsl.NativeImageOptions.configureNativeBinary(imageName: String, fallbackEnabled: Boolean) {
   this.imageName.set(imageName)
   richOutput.set(true)
   verbose.set(true)
@@ -179,7 +165,7 @@ fun NativeImageOptions.configureNativeBinary(imageName: String, fallbackEnabled:
 // *************************************************************************************************************************************
 // Dockerfile.graalpy-vfs instructions *************************************************************************************************
 
-tasks.named<NativeImageDockerfile>("optimizedDockerfileNative") {
+tasks.named<io.micronaut.gradle.docker.NativeImageDockerfile>("optimizedDockerfileNative") {
   jdkVersion.set(jvmVersion)
   graalImage.set("container-registry.oracle.com/graalvm/native-image:$graalVersion")
   baseImage.set("container-registry.oracle.com/graalvm/native-image:$graalVersion")
@@ -194,7 +180,7 @@ tasks.withType<Jar> {
   isZip64 = true
 }
 
-tasks.withType<ShadowJar> {
+tasks.withType<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar> {
   isZip64 = true
 }
 
