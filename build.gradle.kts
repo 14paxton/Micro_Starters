@@ -82,6 +82,8 @@ dependencies {
   testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
 
   // *** AWS *** //
+  /*** from aws micronaut docs ***/
+  //    implementation("io.micronaut:micronaut-http-client")
   implementation("io.micronaut.aws:micronaut-aws-lambda-events-serde")
   /*** Not With Controller ***/
   // implementation("com.amazonaws:aws-lambda-java-events")
@@ -90,15 +92,6 @@ dependencies {
   //*Required for GraalVM Native Image Lambda deployments*
   //   implementation("io.micronaut.aws:micronaut-function-aws-custom-runtime")
 
-
-  /*** email ***/
-  // implementation("io.micronaut.email:micronaut-email-sendgrid")
-
-  /*** reactive streams ***/
-  // implementation("io.micronaut.reactor:micronaut-reactor")
-
-  /*** from aws micronaut docs ***/
-  //    implementation("io.micronaut:micronaut-http-client")
 
   /*** remove dependency for macos ***/
   //    runtimeOnly("io.netty:netty-resolver-dns-native-macos:4.2.0.Alpha4")
@@ -187,7 +180,7 @@ fun org.graalvm.buildtools.gradle.dsl.NativeImageOptions.configureNativeBinary(i
 //        "-Dio.netty.noPreferDirect=true")
 // }
 
-tasks.named<io.micronaut.gradle.docker.NativeImageDockerfile>("dockerfileNative") {
+tasks.named<io.micronaut.gradle.docker.NativeImageDockerfile>("optimizedDockerfileNative") {
   jdkVersion = "21"
   jdkVersion.set(jvmVersion)
   graalImage.set("container-registry.oracle.com/graalvm/native-image:$graalVersion")
