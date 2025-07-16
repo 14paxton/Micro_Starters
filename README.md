@@ -15,6 +15,12 @@
     ./gradlew build
 ```
 
+- using the following to generate reflection meta-data
+
+```shell
+java -agentlib:native-image-agent=config-output-dir=./META-INF/native-image -jar your-micronaut-app.jar
+```
+
 # Test
 
    ```shell
@@ -71,32 +77,80 @@
         docker run  --name nameplatedatalogger --rm -p 8181:8181 nameplate-data-logger:latest
    ```
 
-## Micronaut 4.8.3 Documentation
+# Lambda
 
-- [User Guide](https://docs.micronaut.io/4.8.3/guide/index.html)
-- [API Reference](https://docs.micronaut.io/4.8.3/api/index.html)
-- [Configuration Reference](https://docs.micronaut.io/4.8.3/guide/configurationreference.html)
-- [Micronaut Guides](https://guides.micronaut.io/index.html)
+## Make Call
 
----
+### Local
 
-- [Micronaut Gradle Plugin documentation](https://micronaut-projects.github.io/micronaut-gradle-plugin/latest/)
-- [GraalVM Gradle Plugin documentation](https://graalvm.github.io/native-build-tools/latest/gradle-plugin.html)
-- [Shadow Gradle Plugin](https://gradleup.com/shadow/)
+```shell
+ curl -d '{"to": {"email":"14paxton@gmail.com" , "name":"brandon paxton"}}' \
+     -H "Content-Type: application/json" \
+     -X POST http://localhost:8181/test
+```
 
-## Feature micronaut-aot documentation
+### AWS
 
-- [Micronaut AOT documentation](https://micronaut-projects.github.io/micronaut-aot/latest/guide/)
+### CLI
 
-## Feature serialization-jackson documentation
+#### Deploy Code
 
-- [Micronaut Serialization Jackson Core documentation](https://micronaut-projects.github.io/micronaut-serialization/latest/guide/)
+```shell
+aws lambda update-function-code --function-name GraalVM-Mail --zip-file fileb://./build/libs/changeMe-0.1-optimized-lambda.zip
+```
 
-## Feature graalpy documentation
+### AWS Test
 
-- [Micronaut GraalPy Extension documentation](https://micronaut-projects.github.io/micronaut-graal-languages/latest/guide/)
+```shell
+curl -v 'https://o2ecgfgw7meoucnh7hvffxb2pi0hendb.lambda-url.us-east-1.on.aws/?campaign=test' \
+-H 'content-type: application/json'
+```
 
-- [https://graalvm.org/python](https://graalvm.org/python)
+```json
+{
+  "queryStringParameters": {
+    "campaign": "test"
+  }
+}
+```
 
+#### Using Body
+
+```json
+{
+  "path": "/test",
+  "httpMethod": "GET",
+  "headers": {
+    "Accept": "application/json"
+  },
+  "body": "{\"email\":\"email@gmail.com\", \"name\":\"Example\", \"campaign\":\"TEST\"}"
+}
+```
+
+## Deploy
+
+### Build jar
+
+```shell
+ ./gradlew buildNativeLambda
+```
+
+- > Optimized
+    ```shell
+    ./gradlew :optimizedBuildNativeLambda
+    ```
+
+## API Gateway
+
+### CURL
+
+#### Single email
+
+```shell
+curl -X GET  'https://4lw29o2bw6.execute-api.us-east-1.amazonaws.com/default/test' \
+  -H "Accept: application/json" \
+  -H "Content-Type: application/json" \
+  -d '{"email":"email@gmail.com"}'
+```
 
 

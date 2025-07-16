@@ -1,0 +1,30 @@
+{
+  "resources": {
+    "includes": [
+      {
+        "pattern": ".*\\.jpg"
+      },
+      {
+        "pattern": ".*\\.png"
+      },
+      {
+        "pattern": ".*\\.html"
+      },
+      {
+        "pattern": ".*\\.css"
+      },
+      {
+        "pattern": ".*\\.yml"
+      },
+      {
+        "pattern": ".*\\.yaml"
+      },
+      {
+        "pattern": ".*\\.properties"
+      },
+      {
+        "pattern": ".*\\.json"
+      }
+    ]
+  }
+}
