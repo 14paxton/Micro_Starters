@@ -152,6 +152,7 @@ fun org.graalvm.buildtools.gradle.dsl.NativeImageOptions.configureNativeBinary(i
   fallback.set(fallbackEnabled)
   mainClass.set(mainClassName)
   resources.autodetect()
+  buildArgs.add("--verbose")
   javaLauncher.set(javaToolchains.launcherFor {
     languageVersion.set(JavaLanguageVersion.of(jvmVersion))
     vendor.set(graalJvmVendor)
