@@ -175,7 +175,6 @@ fun org.graalvm.buildtools.gradle.dsl.NativeImageOptions.configureNativeBinary(i
 // }
 
 tasks.named<io.micronaut.gradle.docker.NativeImageDockerfile>("optimizedDockerfileNative") {
-  jdkVersion = "21"
   jdkVersion.set(jvmVersion)
   graalImage.set("container-registry.oracle.com/graalvm/native-image:$graalVersion")
   baseImage.set("amazonlinux:2023")
