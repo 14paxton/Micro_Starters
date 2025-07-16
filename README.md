@@ -141,11 +141,11 @@
 - [Overview Polygot Programming - injecting languages](https://www.graalvm.org/latest/reference-manual/polyglot-programming/)
 - [Gradle plugin docs](https://github.com/oracle/graalpython/blob/master/docs/user/Embedding-Build-Tools.md#graalPy-gradle-plugin)
 
-## Micronaut 4.8.3 Documentation
+## Micronaut latest Documentation
 
-- [User Guide](https://docs.micronaut.io/4.8.3/guide/index.html)
-- [API Reference](https://docs.micronaut.io/4.8.3/api/index.html)
-- [Configuration Reference](https://docs.micronaut.io/4.8.3/guide/configurationreference.html)
+- [User Guide](https://docs.micronaut.io/latest/guide/index.html)
+- [API Reference](https://docs.micronaut.io/latest/api/index.html)
+- [Configuration Reference](https://docs.micronaut.io/latest/guide/configurationreference.html)
 - [Micronaut Guides](https://guides.micronaut.io/index.html)
 
 ---
