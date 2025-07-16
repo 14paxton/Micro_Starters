@@ -74,15 +74,15 @@ dependencies {
   testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
 
   // *** AWS *** //
-  /*** from aws micronaut docs ***/
+  // - From AWS Micronaut Docs //
   //    implementation("io.micronaut:micronaut-http-client")
   implementation("io.micronaut.aws:micronaut-aws-lambda-events-serde")
-  /*** Not With Controller ***/
-  // implementation("com.amazonaws:aws-lambda-java-events")
-  //*For writing raw Lambda functions with minimal Micronaut overhead*
-  //   implementation("io.micronaut.aws:micronaut-function-aws")
-  //*Required for GraalVM Native Image Lambda deployments*
-  //   implementation("io.micronaut.aws:micronaut-function-aws-custom-runtime")
+  /*** Not Used When Using Controller ***/
+  //      implementation("com.amazonaws:aws-lambda-java-events")
+  // - For writing raw Lambda functions with minimal Micronaut overhead //
+  //      implementation("io.micronaut.aws:micronaut-function-aws")
+  // - Required for GraalVM Native Image Lambda deployments //
+  //      implementation("io.micronaut.aws:micronaut-function-aws-custom-runtime")
 
 
   // *** For ARM MacOS Silicone *** //
