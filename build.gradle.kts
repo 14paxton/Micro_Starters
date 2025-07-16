@@ -42,6 +42,21 @@ java {
   }
 }
 
+//** building on mac ** //
+// buildscript {
+//    dependencies {
+//        classpath("com.github.docker-java:docker-java-transport-httpclient5:3.4.0") {
+//            because("M1 macs need a later version of JNA")
+//        }
+//    }
+//}
+
+// shadowJar {
+//    archiveBaseName.set('shadow') // Set the base name of the jar
+//    archiveClassifier.set('')
+//    archiveVersion.set('')
+//}
+
 
 // *************************************************************************************************************************************
 // PYTHON LIBRARIES Import *************************************************************************************************************
