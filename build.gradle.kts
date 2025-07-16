@@ -42,21 +42,11 @@ java {
   }
 }
 
-//** building on mac ** //
-// buildscript {
-//    dependencies {
-//        classpath("com.github.docker-java:docker-java-transport-httpclient5:3.4.0") {
-//            because("M1 macs need a later version of JNA")
-//        }
-//    }
-//}
-
 // shadowJar {
 //    archiveBaseName.set('shadow') // Set the base name of the jar
 //    archiveClassifier.set('')
 //    archiveVersion.set('')
 //}
-
 
 dependencies {
   // Micronaut implementation
@@ -82,6 +72,12 @@ dependencies {
 
   implementation("org.graalvm.polyglot:polyglot:$graalPythonVersion")
   implementation("org.graalvm.polyglot:python:$graalPythonVersion")
+
+  // *** For ARM MacOS Silicone *** //
+  // - Netty native DNS resolver for MacOS (ARM & Intel)
+  //    runtimeOnly("io.netty:netty-resolver-dns-native-macos:4.1.109.Final")
+  // - Docker Java client (optional: only if using Docker/Testcontainers)
+  //    implementation("com.github.docker-java:docker-java-transport-httpclient5:3.4.0")
 }
 
 
