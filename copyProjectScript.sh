@@ -1,8 +1,5 @@
 #!/bin/bash
 
-# Script to copy Spring Boot project files to current directory
-# Usage: Run this script from the target directory where you want to copy the project
-
 # Get the directory where this script is located (source project root)
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 TARGET_DIR="$(pwd)"

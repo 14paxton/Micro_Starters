@@ -1,5 +1,0 @@
-[
-  ["example.micronaut.PygalModule"],
-  ["example.micronaut.PygalModule$StackedBar"],
-  ["example.micronaut.PygalModule$Svg"]
-]
