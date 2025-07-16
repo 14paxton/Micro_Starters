@@ -1,5 +1,9 @@
-import io.micronaut.gradle.docker.NativeImageDockerfile
-import org.graalvm.buildtools.gradle.dsl.NativeImageOptions
+plugins {
+  id("io.micronaut.application") version "4.5.4"
+  id("com.gradleup.shadow") version "8.3.8"
+  id("io.micronaut.aot") version "4.5.3"
+  kotlin("jvm") version "2.2.0"
+}
 
 // *************************************************************************************************************************************
 // Version Variables *******************************************************************************************************************
@@ -14,14 +18,6 @@ val mainClassName = "$groupName.Application"
 
 // END Version Variables ***************************************************************************************************************
 // *************************************************************************************************************************************
-
-
-plugins {
-  id("io.micronaut.application") version "4.5.4"
-  id("com.gradleup.shadow") version "8.3.8"
-  id("io.micronaut.aot") version "4.5.3"
-  kotlin("jvm") version "2.2.0"
-}
 
 group = groupName
 version = "0.1"
@@ -43,6 +39,21 @@ java {
     vendor.set(graalJvmVendor)
   }
 }
+
+//** building on mac ** //
+// buildscript {
+//    dependencies {
+//        classpath("com.github.docker-java:docker-java-transport-httpclient5:3.4.0") {
+//            because("M1 macs need a later version of JNA")
+//        }
+//    }
+//}
+
+// shadowJar {
+//    archiveBaseName.set('shadow') // Set the base name of the jar
+//    archiveClassifier.set('')
+//    archiveVersion.set('')
+//}
 
 
 dependencies {
