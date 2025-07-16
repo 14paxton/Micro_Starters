@@ -61,7 +61,13 @@ java {
 // PYTHON LIBRARIES Import *************************************************************************************************************
 
 val localPackageInstallPathList: Set<String> = resolvePackages(rootDir,
-                                                               listOf(PADDLEPADDLE, PADDLEOCR, SCIPY, PANDAS, SCIKIT_LEARN, SHAPELY, TIKTOKEN))
+                                                               listOf(PipInstall.PackageName.PADDLEPADDLE,
+                                                                      PipInstall.PackageName.PADDLEOCR,
+                                                                      PipInstall.PackageName.SCIPY,
+                                                                      PipInstall.PackageName.PANDAS,
+                                                                      PipInstall.PackageName.SCIKIT_LEARN,
+                                                                      PipInstall.PackageName.SHAPELY,
+                                                                      PipInstall.PackageName.TIKTOKEN))
 val packagesForPipToPull: Set<String> = setOf(
         // "python-dotenv>=1.1.1",
         // "tqdm>=4.67.1",
