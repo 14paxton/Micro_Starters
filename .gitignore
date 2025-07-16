@@ -13,4 +13,7 @@ out/
 .settings
 .classpath
 .factorypath
+.venv
 /.profileconfig.json
+testOutput
+buildSrc/build/

@@ -1,3 +1,14 @@
+# GraalPy
+
+- > Using Micronaut with java and Gradle with Kotlin created an application that can handle http calls and
+  > run Python libraries and code
+
+# Application Endpoints
+
+- [localhost:8181/pygal](http://localhost:8181/pygal ) : PygalController imported python library, uses @GraalPyModule annotation, creates charts
+- [localhost:8181/hello](http://localhost:8181/hello ) : HelloController local python script in resource folder
+- [localhost:8181/sentiment](http://localhost:8181/sentiment) : SentimentAnalysisController manually creating Python context and getting a library
+
 # Install
 
 1) install java GraalVM , if haven't install sdkman
@@ -9,6 +20,35 @@
     sdk env
    ```
 
+# Adding Python Files
+
+- Raw .py files can be placed `resources/org.graalvm.python.vfs/src/`
+- Create a java module and use annotation `@GraalPyModule("hello")`
+- example `hello.py` -> `HelloModule.java` -> `HelloController.java`
+
+## Adding wheels .whl
+
+> if trouble installing, sometimes need download wheel directly
+
+- `python-resources` has `.whl` files `PipInstall.ks` kotlin script for choosing based on OS
+
+### Naming Convention
+
+- example : `paddlepaddle-3.0.0-graalpy311-graalpy242_311_native-macosx_14_0_arm64.whl`
+
+- paddlepaddle: package name
+- 3.0.0: version
+- graalpy311: Python 3.11 for GraalPy
+- graalpy242_311_native: GraalPy 24.2, Python 3.11, native build
+- macosx_14_0_arm64: macOS 14.0 ARM64 platform
+- Why use this convention?
+- GraalPy is not binary-compatible with CPython, so wheels built for CPython may not work.
+- The naming helps pip and GraalPy identify compatible wheels and avoid installation errors.
+
+- Summary:
+
+> Use the GraalPy naming convention for wheels to ensure they are recognized as compatible with the GraalPy runtime and your specific platform.
+
 # Build
 
 ```shell
@@ -17,15 +57,19 @@
 
 # Test
 
-   ```shell
-     ./gradlew test
-   ```
+- > `PygalControllerTest.java` tests the controller and Python functionality
+
+    ```shell
+        ./gradlew test
+    ```
 
 # Run
 
   ```shell
     ./gradlew run
   ```
+
+- view at [http://localhost:8181/ ](http://localhost:8181/ )
 
 # NativeCompile
 
@@ -36,6 +80,13 @@
   ```
 
 - output for native image will be in ```build/native/nativeCompile/```
+
+## Run Native Image
+
+  ```shell
+    ./build/native/nativeCompile/nativeChangeMe
+    
+  ```
 
 ## Optimized Native Compile
 
@@ -50,7 +101,8 @@
 ### Run
 
    ```shell
-        ./build/native/nativeOptimizedCompile/optimizedNativeNameplateDataLogger
+        ./build/native/nativeOptimizedCompile/optimizedNativeChangeMe
+        
    ```
 
 - view at [http://localhost:8181/ ](http://localhost:8181/ )
@@ -64,12 +116,22 @@
    ```
 
 - Dockerfile for build will be `build/docker/native-optimized/DockerfileNative`
+- Created image should be `changeMe:latest`
 
 #### Run Image
 
    ```shell
-        docker run  --name nameplatedatalogger --rm -p 8181:8181 nameplate-data-logger:latest
+        docker run  --name changeMe --rm -p 8181:8181 changeMe:latest
    ```
+
+# Resources
+
+- [Micronaut GraalPy Docs](https://micronaut-projects.github.io/micronaut-graal-languages/latest/guide/)
+- [GraalPy Resource](https://www.graalvm.org/python/)
+- [Oracle graalpython repo](https://github.com/oracle/graalpython?tab=readme-ov-file)
+- [GraalPy Quick Reference Sheet](https://www.graalvm.org/uploads/quick-references/GraalPy_v1/quick-reference-graalpy-v1(eu_a4).pdf)
+- [Overview Polygot Programming - injecting languages](https://www.graalvm.org/latest/reference-manual/polyglot-programming/)
+- [Gradle plugin docs](https://github.com/oracle/graalpython/blob/master/docs/user/Embedding-Build-Tools.md#graalPy-gradle-plugin)
 
 ## Micronaut 4.8.3 Documentation
 
