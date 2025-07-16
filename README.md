@@ -154,3 +154,34 @@ curl -X GET  'https://4lw29o2bw6.execute-api.us-east-1.amazonaws.com/default/tes
 ```
 
 
+# Resources
+
+
+## Micronaut Documentation
+
+- [User Guide](https://docs.micronaut.io/latest/guide/index.html)
+- [API Reference](https://docs.micronaut.io/latest/api/index.html)
+- [Configuration Reference](https://docs.micronaut.io/latest/guide/configurationreference.html)
+- [Micronaut Guides](https://guides.micronaut.io/index.html)
+
+---
+
+- [Micronaut Gradle Plugin documentation](https://micronaut-projects.github.io/micronaut-gradle-plugin/latest/)
+- [GraalVM Gradle Plugin documentation](https://graalvm.github.io/native-build-tools/latest/gradle-plugin.html)
+- [Shadow Gradle Plugin](https://gradleup.com/shadow/)
+
+## AWS 
+
+- [Micronaut AWS Docs](https://micronaut-projects.github.io/micronaut-aws/latest/guide/#lambda)
+- [Micronaut Lambda Tutorials](https://micronaut-projects.github.io/micronaut-aws/latest/guide/#lambdaTutorials)
+- [Micronaut AWS Runtimes](https://micronaut-projects.github.io/micronaut-aws/latest/guide/#customRuntimes)
+
+- [AWS Lambda Runtime](https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtimes.html)
+
+## Feature micronaut-aot documentation
+
+- [Micronaut AOT documentation](https://micronaut-projects.github.io/micronaut-aot/latest/guide/)
+
+## Feature serialization-jackson documentation
+
+- [Micronaut Serialization Jackson Core documentation](https://micronaut-projects.github.io/micronaut-serialization/latest/guide/)

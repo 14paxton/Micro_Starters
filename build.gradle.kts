@@ -1,5 +1,9 @@
-import io.micronaut.gradle.docker.NativeImageDockerfile
-import org.graalvm.buildtools.gradle.dsl.NativeImageOptions
+plugins {
+  id("io.micronaut.application") version "4.5.4"
+  id("com.gradleup.shadow") version "8.3.8"
+  id("io.micronaut.aot") version "4.5.3"
+  kotlin("jvm") version "2.2.0"
+}
 
 // *************************************************************************************************************************************
 // Version Variables *******************************************************************************************************************
@@ -14,14 +18,6 @@ val mainClassName = "$groupName.Application"
 
 // END Version Variables ***************************************************************************************************************
 // *************************************************************************************************************************************
-
-
-plugins {
-  id("io.micronaut.application") version "4.5.4"
-  id("com.gradleup.shadow") version "8.3.8"
-  id("io.micronaut.aot") version "4.5.3"
-  kotlin("jvm") version "2.2.0"
-}
 
 group = groupName
 version = "0.1"
@@ -134,18 +130,6 @@ micronaut {
   }
 }
 
-// micronaut {
-//   runtime("netty")
-//   testRuntime("junit5")
-//   processing {
-//     incremental(true)
-//     annotations("$groupName.*")
-//   }
-//   aot {
-//     configFile = file("gradle/micronaut-aot.properties")
-//   }
-// }
-
 // END Micronaut ***********************************************************************************************************************
 // *************************************************************************************************************************************
 
@@ -169,7 +153,7 @@ graalvmNative {
   }
 }
 
-fun NativeImageOptions.configureNativeBinary(imageName: String, fallbackEnabled: Boolean) {
+fun org.graalvm.buildtools.gradle.dsl.NativeImageOptions.configureNativeBinary(imageName: String, fallbackEnabled: Boolean) {
   this.imageName.set(imageName)
   richOutput.set(true)
   verbose.set(true)
@@ -190,11 +174,6 @@ fun NativeImageOptions.configureNativeBinary(imageName: String, fallbackEnabled:
 // *************************************************************************************************************************************
 // Dockerfile *************************************************************************************************
 
-// dockerfileNative {
-//    jdkVersion = '21'
-//    graalArch.set(org.apache.tools.ant.taskdefs.condition.Os.isArch("aarch64") ? "aarch64" : "amd64")
-//    graalImage.set('ghcr.io/graalvm/graalvm-ce:ol8-java17-22.3.3')
-//}
 
 // tasks.named("nativeCompile") {
 //    classpathJar = layout.projectDirectory.file("build/libs/shadow.jar")
@@ -208,11 +187,17 @@ fun NativeImageOptions.configureNativeBinary(imageName: String, fallbackEnabled:
 //        "-Dio.netty.noPreferDirect=true")
 // }
 
-tasks.named<NativeImageDockerfile>("optimizedDockerfileNative") {
+tasks.named<io.micronaut.gradle.docker.NativeImageDockerfile>("dockerfileNative") {
+  jdkVersion = "21"
   jdkVersion.set(jvmVersion)
   graalImage.set("container-registry.oracle.com/graalvm/native-image:$graalVersion")
-  baseImage.set("container-registry.oracle.com/graalvm/native-image:$graalVersion")
+  baseImage.set("amazonlinux:2023")
   exposedPorts.set(setOf(port.toInt()))
+  args(
+          "-XX:MaximumHeapSizePercent=80",
+          "-Dio.netty.allocator.numDirectArenas=0",
+          "-Dio.netty.noPreferDirect=true"
+      )
 }
 
 // END Dockerfile **********************************************************************************************************
