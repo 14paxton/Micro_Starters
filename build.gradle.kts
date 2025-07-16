@@ -58,46 +58,6 @@ java {
 //}
 
 
-// *************************************************************************************************************************************
-// PYTHON LIBRARIES Import *************************************************************************************************************
-
-val localPackageInstallPathList: Set<String> = PipInstall.resolvePackages(rootDir,
-                                                                          listOf(PipInstall.PackageName.PADDLEPADDLE,
-                                                                                 PipInstall.PackageName.PADDLEOCR,
-                                                                                 PipInstall.PackageName.SCIPY,
-                                                                                 PipInstall.PackageName.PANDAS,
-                                                                                 PipInstall.PackageName.SCIKIT_LEARN,
-                                                                                 PipInstall.PackageName.SHAPELY,
-                                                                                 PipInstall.PackageName.TIKTOKEN))
-val packagesForPipToPull: Set<String> = setOf(
-        // "python-dotenv>=1.1.1",
-        // "tqdm>=4.67.1",
-        // "PyYAML>=6.0.2",
-        // "pydantic>=2.11.7",
-        "numpy>=1.26.4",
-        "pillow>=11.3.0",
-        "pygal",
-        "vader-sentiment==3.2.1.1",
-        "requests"
-                                             )
-
-graalPy {
-
-  // resourceDirectory.set("GRAALPY-VFS/com/skeleton")
-  // resourceDirectory.set("org.graalvm.python.vfs")
-
-  packages.set(buildSet {
-    add("--prefer-binary")
-    add(PipInstall.wheelOsStandard)
-    addAll(packagesForPipToPull)
-    // addAll(localPackageInstallPathList)
-  })
-}
-
-// END PYTHON LIBRARIES Import *********************************************************************************************************
-// *************************************************************************************************************************************
-
-
 dependencies {
   // Micronaut implementation
   implementation("io.micronaut:micronaut-http-server-netty")
@@ -199,6 +159,46 @@ tasks.withType<Jar> {
 tasks.withType<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar> {
   isZip64 = true
 }
+
+
+// *************************************************************************************************************************************
+// PYTHON LIBRARIES Import *************************************************************************************************************
+
+val localPackageInstallPathList: Set<String> = PipInstall.resolvePackages(rootDir,
+                                                                          listOf(PipInstall.PackageName.PADDLEPADDLE,
+                                                                                 PipInstall.PackageName.PADDLEOCR,
+                                                                                 PipInstall.PackageName.SCIPY,
+                                                                                 PipInstall.PackageName.PANDAS,
+                                                                                 PipInstall.PackageName.SCIKIT_LEARN,
+                                                                                 PipInstall.PackageName.SHAPELY,
+                                                                                 PipInstall.PackageName.TIKTOKEN))
+val packagesForPipToPull: Set<String> = setOf(
+        // "python-dotenv>=1.1.1",
+        // "tqdm>=4.67.1",
+        // "PyYAML>=6.0.2",
+        // "pydantic>=2.11.7",
+        "numpy>=1.26.4",
+        "pillow>=11.3.0",
+        "pygal",
+        "vader-sentiment==3.2.1.1",
+        "requests"
+                                             )
+
+graalPy {
+
+  // resourceDirectory.set("GRAALPY-VFS/com/skeleton")
+  // resourceDirectory.set("org.graalvm.python.vfs")
+
+  packages.set(buildSet {
+    add("--prefer-binary")
+    add(PipInstall.wheelOsStandard)
+    addAll(packagesForPipToPull)
+    // addAll(localPackageInstallPathList)
+  })
+}
+
+// END PYTHON LIBRARIES Import *********************************************************************************************************
+// *************************************************************************************************************************************
 
 
 //*************************************************************************************************************************
