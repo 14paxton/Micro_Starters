@@ -5,9 +5,9 @@
 
 # Application Endpoints
 
-- [localhost:8181/pygal](http://localhost:8181/pygal ) : PygalController imported python library, uses @GraalPyModule annotation, creates charts
-- [localhost:8181/hello](http://localhost:8181/hello ) : HelloController local python script in resource folder
-- [localhost:8181/sentiment](http://localhost:8181/sentiment) : SentimentAnalysisController manually creating Python context and getting a library
+- [localhost:8181/pygal](http://localhost:8181/pygal )
+- [localhost:8181/hello](http://localhost:8181/hello )
+- [localhost:8181/sentiment](http://localhost:8181/sentiment)
 
 # Install
 
@@ -20,9 +20,18 @@
     sdk env
    ```
 
+## MacOs
+
+- May need for some libraries
+    ```shell
+        brew install jpeg;
+        brew install libtiff libjpeg libpng freetype;
+        brew install pkg-config;
+    ```
+
 # Adding Python Files
 
-- Raw .py files can be placed `resources/org.graalvm.python.vfs/src/`
+- Raw `*.py` files can be placed `resources/org.graalvm.python.vfs/src/`
 - Create a java module and use annotation `@GraalPyModule("hello")`
 - example `hello.py` -> `HelloModule.java` -> `HelloController.java`
 
@@ -30,30 +39,31 @@
 
 > if trouble installing, sometimes need download wheel directly
 
-- `python-resources` has `.whl` files `PipInstall.ks` kotlin script for choosing based on OS
+- `python-resources` has `*.whl` files
+- `PipInstall.ks` kotlin script for dynamically choosing files based on OS
 
-### Naming Convention
+### Naming Convention When Adding binary `*.whl` files
 
-- example : `paddlepaddle-3.0.0-graalpy311-graalpy242_311_native-macosx_14_0_arm64.whl`
+- > Example : `paddlepaddle-3.0.0-graalpy311-graalpy242_311_native-macosx_14_0_arm64.whl`
 
-- paddlepaddle: package name
-- 3.0.0: version
-- graalpy311: Python 3.11 for GraalPy
-- graalpy242_311_native: GraalPy 24.2, Python 3.11, native build
-- macosx_14_0_arm64: macOS 14.0 ARM64 platform
-- Why use this convention?
-- GraalPy is not binary-compatible with CPython, so wheels built for CPython may not work.
-- The naming helps pip and GraalPy identify compatible wheels and avoid installation errors.
+    - `paddlepaddle`: package name
+    - `3.0.0`: version
+    - `graalpy311`: Python 3.11 for GraalPy
+    - `graalpy242_311_native`: GraalPy 24.2, Python 3.11, native build
+    - `macosx_14_0_arm64`: macOS 14.0 ARM64 platform
 
-- Summary:
+- > Why use this convention?
 
-> Use the GraalPy naming convention for wheels to ensure they are recognized as compatible with the GraalPy runtime and your specific platform.
+    - GraalPy is not binary-compatible with CPython, so wheels built for CPython may not work.
+    - The naming helps pip and GraalPy identify compatible wheels and avoid installation errors.
+
+      > Use the GraalPy naming convention for wheels to ensure they are recognized as compatible with the GraalPy runtime and your specific platform.
 
 # Build
 
-```shell
-    ./gradlew build
-```
+  ```shell
+      ./gradlew build
+  ```
 
 # Test
 
@@ -69,7 +79,7 @@
     ./gradlew run
   ```
 
-- view at [http://localhost:8181/ ](http://localhost:8181/ )
+- View At: [http://localhost:8181/ ](http://localhost:8181/ )
 
 # NativeCompile
 
@@ -85,7 +95,6 @@
 
   ```shell
     ./build/native/nativeCompile/nativeChangeMe
-    
   ```
 
 ## Optimized Native Compile
@@ -102,10 +111,9 @@
 
    ```shell
         ./build/native/nativeOptimizedCompile/optimizedNativeChangeMe
-        
    ```
 
-- view at [http://localhost:8181/ ](http://localhost:8181/ )
+- View At: [http://localhost:8181/ ](http://localhost:8181/ )
 
 ### Create Docker File and Image from GraalVm Native Image
 
