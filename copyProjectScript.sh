@@ -29,6 +29,8 @@ EXCLUDE_PATTERNS=(
     --exclude='.vscode/'
     --exclude='*.class'
     --exclude='copy-project.sh'
+    --exclude='.venv/'
+    --exclude='testOutput'
 )
 
 # Copy files using rsync
