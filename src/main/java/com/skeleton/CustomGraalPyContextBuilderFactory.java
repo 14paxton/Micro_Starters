@@ -11,29 +11,26 @@ import org.graalvm.python.embedding.VirtualFileSystem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@Singleton @Replaces(GraalPyContextBuilderFactory.class)
+@Singleton
+@Replaces(GraalPyContextBuilderFactory.class)
 public class CustomGraalPyContextBuilderFactory implements GraalPyContextBuilderFactory {
   @Value("${graalpy.vfs.resource-directory}")
-  private String resourceDirectory;
-
+  String resourceDirectory;
   private static final Logger LOG = LoggerFactory.getLogger(CustomGraalPyContextBuilderFactory.class);
 
   @Override
   public Context.Builder createBuilder() {
-    LOG.debug("creating custom GraalPyContext");
-    Engine engine = Engine.create();
+    LOG.debug("***getting custom GraalPyContext");
 
-    VirtualFileSystem vfs = VirtualFileSystem.newBuilder()
-                                             .resourceDirectory(resourceDirectory)
-                                             .build();
-
-    return GraalPyResources.contextBuilder(vfs)
-                           .engine(engine)
+    return GraalPyResources.contextBuilder(VirtualFileSystem.newBuilder()
+                                                            .resourceDirectory(resourceDirectory)
+                                                            .build())
+                           .engine(Engine.create())
                            .allowNativeAccess(true)
                            .allowCreateProcess(true)
                            .allowExperimentalOptions(true)
                            .option("python.IsolateNativeModules", "false")
+                           .option("python.NativeModules", "true")
                            .option("python.WarnExperimentalFeatures", "false");
-
   }
 }
