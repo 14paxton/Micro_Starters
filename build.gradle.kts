@@ -1,9 +1,9 @@
 plugins {
-  id("io.micronaut.application") version "4.5.4"
-  id("com.gradleup.shadow") version "8.3.8"
-  id("io.micronaut.aot") version "4.5.3"
-  kotlin("jvm") version "2.2.0"
-  id("org.graalvm.python") version "24.2.1"
+  id("io.micronaut.application")
+  id("com.gradleup.shadow")
+  id("io.micronaut.aot")
+  id("org.jetbrains.kotlin.jvm")
+  id("org.graalvm.python")
 }
 
 // *************************************************************************************************************************************
@@ -124,10 +124,10 @@ fun org.graalvm.buildtools.gradle.dsl.NativeImageOptions.configureNativeBinary(i
   mainClass.set(mainClassName)
   resources.autodetect()
   buildArgs.add("--verbose")
-  javaLauncher.set(javaToolchains.launcherFor {
-    languageVersion.set(JavaLanguageVersion.of(jvmVersion))
-    vendor.set(graalJvmVendor)
-  })
+  // javaLauncher.set(javaToolchains.launcherFor {
+  //   languageVersion.set(JavaLanguageVersion.of(jvmVersion))
+  //   vendor.set(graalJvmVendor)
+  // })
 }
 
 // END GraalVM options *****************************************************************************************************************

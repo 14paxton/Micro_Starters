@@ -59,6 +59,72 @@
 
       > Use the GraalPy naming convention for wheels to ensure they are recognized as compatible with the GraalPy runtime and your specific platform.
 
+# Modifying VFS File Location
+
+> When using` @GraalPyModule` with Micronaut's automatic context management, you don't directly initialize the Python context yourself. Here's where
+> you would configure the VFS resource directory:
+
+## Option 1: Global Configuration (Recommended)
+
+- Create a configuration class to set the VFS resource directory globally:
+
+    ```java
+        package com.nameplate;
+        
+        import io.micronaut.context.annotation.Bean;
+        import io.micronaut.context.annotation.Configuration;
+        import org.graalvm.python.embedding.utils.VirtualFileSystem;
+        
+        @Configuration
+        public class GraalPyConfig {
+        
+              @Bean
+              public VirtualFileSystem virtualFileSystem() {
+                  return VirtualFileSystem.newBuilder()
+                      .resourceDirectory("GRAALPY-VFS/com/nameplate")
+                      .build();
+              }
+        }
+    ```
+
+## Option 2: Application Properties
+
+- Configure in application.yml:
+
+    ```yaml
+        graalpy:
+        vfs:
+        resource-directory: "GRAALPY-VFS/com/nameplate"
+    ```
+
+## Option 3: Micronaut Context Configuration
+
+- If using Micronaut's context factory directly:
+
+    ```java
+        package com.nameplate;
+        
+        import io.micronaut.context.annotation.Bean;
+        import io.micronaut.context.annotation.Configuration;
+        import io.micronaut.graalpy.GraalPyContext;
+        import org.graalvm.python.embedding.utils.VirtualFileSystem;
+        
+        @Configuration
+        public class GraalPyConfig {
+        
+          @Bean
+          public GraalPyContext graalPyContext() {
+            VirtualFileSystem vfs = VirtualFileSystem.newBuilder()
+                                                     .resourceDirectory("GRAALPY-VFS/com/nameplate")
+                                                     .build();
+        
+            return GraalPyContext.newBuilder()
+                                 .virtualFileSystem(vfs)
+                                 .build();
+          }
+        }
+    ```
+  
 # Build
 
   ```shell

@@ -4,3 +4,7 @@ micronaut:
     port: 8181
   application:
     name: changeMe
+
+  graalpy:
+    vfs:
+      resource-directory: "GRAALPY-VFS/com/skeleton"

@@ -1,0 +1,12 @@
+[
+  {
+    "name": "kotlin.coroutines.intrinsics.CoroutineSingletons",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "kotlin.coroutines.intrinsics.IntrinsicsKt__IntrinsicsKt",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true
+  }
+]
