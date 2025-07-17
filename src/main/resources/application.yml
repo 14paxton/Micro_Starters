@@ -5,6 +5,6 @@ micronaut:
   application:
     name: changeMe
 
-  graalpy:
-    vfs:
-      resource-directory: "GRAALPY-VFS/com/skeleton"
+graalpy:
+  vfs:
+    resource-directory: "GRAALPY-VFS/com.skeleton.changeMe"

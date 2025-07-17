@@ -9,14 +9,18 @@ plugins {
 // *************************************************************************************************************************************
 // Version Variables *******************************************************************************************************************
 
+val graalPythonVersion: String by project
 val graalVersion: String by project
 val port: String by project
 val jvmVersion: String by project
-val javaVersion = JavaVersion.toVersion(jvmVersion)
-val graalJvmVendor = JvmVendorSpec.ORACLE
+
+val javaVersion: JavaVersion = JavaVersion.toVersion(jvmVersion)
+val javaLanguageVersion: JavaLanguageVersion = JavaLanguageVersion.of(jvmVersion)
+val graalJvmVendor: JvmVendorSpec = JvmVendorSpec.GRAAL_VM
+
 val groupName = "com.skeleton"
 val mainClassName = "$groupName.Application"
-val graalPythonVersion: String by project
+val resourceFileLocation = "GRAALPY-VFS/$groupName.${rootProject.name}"
 
 // END Version Variables ***************************************************************************************************************
 // *************************************************************************************************************************************
@@ -25,8 +29,8 @@ group = groupName
 version = "0.1"
 
 repositories {
-  mavenLocal()
   mavenCentral()
+  mavenLocal()
 }
 
 application {
@@ -37,16 +41,10 @@ java {
   sourceCompatibility = javaVersion
   targetCompatibility = javaVersion
   toolchain {
-    languageVersion.set(JavaLanguageVersion.of(jvmVersion))
+    languageVersion.set(javaLanguageVersion)
     vendor.set(graalJvmVendor)
   }
 }
-
-// shadowJar {
-//    archiveBaseName.set('shadow') // Set the base name of the jar
-//    archiveClassifier.set('')
-//    archiveVersion.set('')
-//}
 
 dependencies {
   // Micronaut implementation
@@ -104,19 +102,21 @@ micronaut {
 // GraalVM Gradle Plugin options : https://graalvm.github.io/native-build-tools/latest/gradle-plugin.html ******************************
 
 graalvmNative {
-  toolchainDetection = false
+  toolchainDetection.set(true)
   binaries {
     named("main") {
-      configureNativeBinary("nativeChangeMe", fallbackEnabled = false)
+      configureNativeBinary("native-${rootProject.name}", fallbackEnabled = false)
     }
 
     named("optimized") {
-      configureNativeBinary("optimizedNativeChangeMe", fallbackEnabled = true)
+      configureNativeBinary("optimized-${rootProject.name}", fallbackEnabled = true)
     }
   }
 }
 
 fun org.graalvm.buildtools.gradle.dsl.NativeImageOptions.configureNativeBinary(imageName: String, fallbackEnabled: Boolean) {
+  println("*** Configuring Native Binary *** $imageName ***")
+
   this.imageName.set(imageName)
   richOutput.set(true)
   verbose.set(true)
@@ -124,8 +124,12 @@ fun org.graalvm.buildtools.gradle.dsl.NativeImageOptions.configureNativeBinary(i
   mainClass.set(mainClassName)
   resources.autodetect()
   buildArgs.add("--verbose")
+  buildArgs.add("--initialize-at-build-time=kotlin")
+  buildArgs.add("-march=native")
+  buildArgs.add("-Ob")
+  // jvmArgs.add("-Xmx8g")
   // javaLauncher.set(javaToolchains.launcherFor {
-  //   languageVersion.set(JavaLanguageVersion.of(jvmVersion))
+  //   languageVersion.set(javaLanguageVersion)
   //   vendor.set(graalJvmVendor)
   // })
 }
@@ -135,18 +139,21 @@ fun org.graalvm.buildtools.gradle.dsl.NativeImageOptions.configureNativeBinary(i
 
 
 // *************************************************************************************************************************************
-// Dockerfile.graalpy-vfs instructions *************************************************************************************************
+// Build Task Modifications *************************************************************************************************
+
+// tasks.named<org.graalvm.buildtools.gradle.tasks.BuildNativeImageTask>("nativeCompile") {
+//
+//   println("*** NativeCompile ***")
+//
+// }
 
 tasks.named<io.micronaut.gradle.docker.NativeImageDockerfile>("optimizedDockerfileNative") {
   jdkVersion.set(jvmVersion)
   graalImage.set("container-registry.oracle.com/graalvm/native-image:$graalVersion")
-  baseImage.set("container-registry.oracle.com/graalvm/native-image:$graalVersion")
+  baseImage.set("amazonlinux:2023")
   exposedPorts.set(setOf(port.toInt()))
+  args("-XX:MaximumHeapSizePercent=80", "-Dio.netty.allocator.numDirectArenas=0", "-Dio.netty.noPreferDirect=true")
 }
-
-// END Dockerfile.graalpy-vfs **********************************************************************************************************
-// *************************************************************************************************************************************
-
 
 tasks.withType<Jar> {
   isZip64 = true
@@ -154,7 +161,12 @@ tasks.withType<Jar> {
 
 tasks.withType<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar> {
   isZip64 = true
+  archiveBaseName.set("shadow")
+  archiveVersion.set(version.toString())
 }
+
+// END Build Task Modifications **********************************************************************************************************
+// *************************************************************************************************************************************
 
 
 // *************************************************************************************************************************************
@@ -182,9 +194,10 @@ val packagesForPipToPull: Set<String> = setOf(
 
 graalPy {
 
-  // resourceDirectory.set("GRAALPY-VFS/com/skeleton")
+  //  ** Default Location - Don't need to set - for ref **//
   // resourceDirectory.set("org.graalvm.python.vfs")
 
+  resourceDirectory.set(resourceFileLocation)
   packages.set(buildSet {
     add("--prefer-binary")
     add(PipInstall.wheelOsStandard)
@@ -213,7 +226,7 @@ tasks.register<Copy>("copyVenvResources") {
   description = "Cleans then copies GraalPy venv resources to .venv"
   dependsOn("graalPyResources", cleanVenv)
 
-  from(layout.buildDirectory.dir("generated/graalpy/resources/org.graalvm.python.vfs/venv")) {
+  from(layout.buildDirectory.dir("generated/graalpy/resources/$resourceFileLocation/venv")) {
     include("**/*")
   }
   into(layout.projectDirectory.dir(".venv"))
@@ -223,9 +236,14 @@ tasks.register<Copy>("copyVenvResources") {
   }
 }
 
-
 tasks.named("graalPyResources") {
   finalizedBy("copyVenvResources")
 }
 
 // END Python Resources For Local .VENV ***********************************************************************************************
+
+// *************************************************************************************************************************************
+// Build Performance Optimizations *****************************************************************************************************
+
+// Enable build caching and parallel execution
+gradle.startParameter.isBuildCacheEnabled = true

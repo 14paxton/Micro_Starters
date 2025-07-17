@@ -1,13 +1,14 @@
 package com.skeleton.services;
 
 import com.skeleton.modules.TestImageModule;
+import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 
 @Singleton
 public class TestImageService {
-
   private final TestImageModule testImageModule;
 
+  @Inject
   public TestImageService(TestImageModule testImageModule) {
     this.testImageModule = testImageModule;
   }

@@ -1,4 +1,4 @@
-package com.skeleton.services;
+package com.skeleton.modules;
 
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import jakarta.inject.Inject;
@@ -13,16 +13,16 @@ import java.time.LocalDateTime;
 import static org.junit.jupiter.api.Assertions.*;
 
 @MicronautTest
-class TestImageServiceTest {
+class TestImageModuleTest {
   private final Path projectRoot = Paths.get(System.getProperty("user.dir"));
   private final Path testOutputDir = projectRoot.resolve("testOutput");
 
   @Inject
-  TestImageService testImageService;
+  TestImageModule TestImageModule;
 
   @Test
   void testModuleInjection() {
-    assertNotNull(testImageService, "TestImageModule should be injected");
+    assertNotNull(TestImageModule, "TestImageModule should be injected");
   }
 
   @Test
@@ -33,7 +33,8 @@ class TestImageServiceTest {
     String fileName = String.format("test_image_%s.png", date);
     Path testFilePath = testOutputDir.resolve(fileName);
 
-    assertDoesNotThrow(() -> testImageService.createTestImage(String.valueOf(testFilePath)), "create_test_image should execute without throwing exceptions");
+    assertDoesNotThrow(() -> TestImageModule.create_test_image(String.valueOf(testFilePath)),
+                       "create_test_image should execute without throwing exceptions");
 
     boolean fileExists = Files.exists(testFilePath);
     assertTrue(fileExists, "Test file should exist in testOutput directory");
