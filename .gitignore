@@ -18,3 +18,4 @@ out/
 testOutput
 buildSrc/build/
 /src/main/.profileconfig.json
+logs

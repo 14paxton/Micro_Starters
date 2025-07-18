@@ -15,9 +15,11 @@ public class DataAnalysisService {
   DataAnalysisModule dataAnalysisModule;
 
   public String mean(StreamingFileUpload file) throws IOException {
-    return dataAnalysisModule.mean(new String(file.asInputStream()
-                                                  .readAllBytes(), StandardCharsets.UTF_8))
-                             .toString();
+    try (var inputStream = file.asInputStream()) {
+      byte[] bytes = inputStream.readAllBytes();
+      String csvContent = new String(bytes, StandardCharsets.UTF_8);
+      return dataAnalysisModule.mean(csvContent).toString();
+    }
   }
 
 }
